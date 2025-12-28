@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pembelajaran Informatika</title>
+
+<style>
+/* ===== RESET & BODY ===== */
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#1e88e5,#64b5f6);
+  overflow:hidden;
+}
+
+/* ===== BACKGROUND ANIMATION ===== */
+.bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
+.circle{position:absolute;border-radius:50%;background:rgba(255,255,255,0.5);}
+
+/* ===== BOX ===== */
+.box{
+  background:#ffffff;
+  max-width:420px;
+  margin:40px auto;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.3);
+  opacity:0;
+  transform:translateY(50px);
+}
+.hidden{display:none;}
+
+h2{text-align:center;color:#0d47a1;}
+p{font-size:14px;line-height:1.7;}
+
+input,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+button{
+  background:#1e88e5;
+  color:white;
+  border:none;
+  font-size:15px;
+}
+button:active{transform:scale(.97);}
+
+.nav{display:flex;gap:10px;margin-top:15px;}
+.footer{text-align:center;font-size:12px;color:#555;margin-top:20px;}
+.toggle{position:fixed;top:15px;right:15px;background:white;padding:8px 12px;border-radius:20px;font-size:12px;}
+.show-pass{font-size:12px;margin-top:5px;cursor:pointer;color:#1e88e5}
+
+/* ===== DARK MODE ===== */
+.dark{background:#121212 !important;}
+.dark .box{background:#1e1e1e;color:#fff;}
+.dark h2{color:#90caf9;}
+.dark p{color:#e0e0e0;}
+.dark input{background:#2c2c2c;color:#fff;border:1px solid #555;}
+.dark button{background:#1565c0;}
+.dark .toggle{background:#333;color:#fff;}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg" id="bg"></div>
+<div class="toggle" onclick="darkMode()">🌙 Dark</div>
+
+<!-- LOGIN (DASAR TETAP ADA) -->
+<div class="box" id="login">
+  <h2>Login</h2>
+  <input id="nama" placeholder="Nama">
+  <input id="pass" type="password" placeholder="Password">
+  <div class="show-pass" onclick="lihatPassword()">👁 Lihat Password</div>
+  <button onclick="masuk()">Masuk</button>
+  <p style="text-align:center">"Belajar hari ini, sukses di masa depan"</p>
+</div>
+
+<!-- MATERI (TIDAK HILANG) -->
+<div class="box hidden" id="materi">
+  <h2 id="judul"></h2>
+  <p id="isi"></p>
+  <p id="ringkasan" style="font-style:italic"></p>
+
+  <div class="nav">
+    <button onclick="prev()">◀ Sebelumnya</button>
+    <button onclick="next()">Berikutnya ▶</button>
+  </div>
+
+  <button onclick="keluar()" style="margin-top:10px;background:#e53935">Keluar</button>
+  <div class="footer">Pembelajaran Informatika • 2025</div>
+</div>
+
+<script>
+/* ===== BACKGROUND ANIMATION ===== */
+const bg=document.getElementById('bg');
+let circles=[];
+for(let i=0;i<10;i++){
+  let c=document.createElement('div');
+  let s=Math.random()*80+40;
+  c.className='circle';
+  c.style.width=s+'px';
+  c.style.height=s+'px';
+  c.style.left=Math.random()*innerWidth+'px';
+  c.style.top=Math.random()*innerHeight+'px';
+  bg.appendChild(c);
+  circles.push({el:c,spd:Math.random()*0.6+0.2});
+}
+function animBG(){
+  circles.forEach(c=>{
+    let t=c.el.offsetTop-c.spd;
+    if(t<-100)t=innerHeight+100;
+    c.el.style.top=t+'px';
+  });
+  requestAnimationFrame(animBG);
+}
+animBG();
+
+/* ===== ANIMASI BOX ===== */
+function show(el){
+  el.style.display='block';
+  let o=0,y=40;
+  let a=setInterval(()=>{
+    o+=0.05; y-=2;
+    el.style.opacity=o;
+    el.style.transform=`translateY(${y}px)`;
+    if(o>=1)clearInterval(a);
+  },16);
+}
+show(login);
+
+/* ===== LOGIN ===== */
+function masuk(){
+  if(!nama.value||!pass.value){
+    alert("Isi nama dan password!");
+    return;
+  }
+  login.style.display='none';
+  materi.classList.remove('hidden');
+  show(materi);
+  load();
+}
+function keluar(){
+  materi.style.display='none';
+  login.style.display='block';
+  show(login);
+}
+
+/* ===== LIHAT PASSWORD ===== */
+function lihatPassword(){
+  pass.type = pass.type === "password" ? "text" : "password";
+}
+
+/* ===== DATA MATERI ===== */
+const data=[
+ {j:"Pengertian Informatika",
+  i:"Informatika adalah ilmu yang mempelajari pengolahan data dan informasi menggunakan komputer.",
+  r:"Informatika berhubungan dengan data, informasi, dan teknologi."},
+ {j:"Sejarah Informatika",
+  i:"Informatika berkembang sejak komputer generasi awal hingga teknologi modern.",
+  r:"Perkembangan informatika sejalan dengan perkembangan komputer."},
+ {j:"Manfaat Informatika",
+  i:"Membantu manusia bekerja lebih cepat dan efisien.",
+  r:"Informatika sangat membantu kehidupan sehari-hari."},
+ {j:"Dampak Informatika",
+  i:"Memberikan dampak positif dan negatif sehingga harus digunakan bijak.",
+  r:"Teknologi harus digunakan secara bertanggung jawab."}
+];
+let idx=0;
+function load(){
+  judul.innerText=data[idx].j;
+  isi.innerText=data[idx].i;
+  ringkasan.innerText="Ringkasan: "+data[idx].r;
+}
+function next(){if(idx<data.length-1){idx++;load();}}
+function prev(){if(idx>0){idx--;load();}}
+
+/* ===== DARK MODE ===== */
+function darkMode(){
+  document.body.classList.toggle("dark");
+}
+</script>
+
+</body>
+</html>
